@@ -13,7 +13,7 @@ DEPENDS += "gperf-native"
 DEPENDS_append_libc-musl = " libexecinfo"
 
 SRC_URI = "\
-        http://gsdview.appspot.com/chromium-browser-official/chromium-${PV}.tar.xz \
+        https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV}.tar.xz \
         file://include.gypi \
         file://oe-defaults.gypi \
         file://google-chrome \
