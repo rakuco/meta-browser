@@ -1,4 +1,4 @@
-DESCRIPTION = "Chromium browser"
+DESCRIPTION = "Chromium is an open-source browser project that aims to build a safer, faster, and more stable way for all users to experience the web."
 
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d"
