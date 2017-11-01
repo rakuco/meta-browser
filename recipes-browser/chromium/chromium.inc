@@ -13,7 +13,7 @@ COMPATIBLE_MACHINE_aarch64 = "(.*)"
 # the variable CHROMIUM_BUILD_TYPE to "Debug" in your conf/local.conf file.
 CHROMIUM_BUILD_TYPE ??= "Release"
 
-inherit gettext pythonnative
+inherit pythonnative
 
 ARMFPABI_armv7a = "${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'arm_float_abi=hard', 'arm_float_abi=softfp', d)}"
 ARMFPABI_armv7ve = "${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'arm_float_abi=hard', 'arm_float_abi=softfp', d)}"
