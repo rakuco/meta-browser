@@ -2,7 +2,12 @@ include chromium-browser.inc
 
 inherit distro_features_check
 
-DEPENDS += "xextproto gtk+ libxi libxss"
+DEPENDS += " \
+    gtk+ \
+    libxi \
+    libxss \
+    xextproto \
+"
 
 SRC_URI += "\
         file://chromium/add_missing_stat_h_include.patch \

@@ -1,5 +1,18 @@
 LICENSE = "BSD"
-DEPENDS = "xz-native pciutils pulseaudio cairo nss zlib-native cups ninja-native gconf libexif pango libdrm"
+DEPENDS = " \
+    cairo \
+    cups \
+    gconf \
+    libdrm \
+    libexif \
+    ninja-native \
+    nss \
+    pango \
+    pciutils \
+    pulseaudio \
+    xz-native \
+    zlib-native \
+"
 
 COMPATIBLE_MACHINE = "(-)"
 COMPATIBLE_MACHINE_x86 = "(.*)"
