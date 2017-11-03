@@ -1,4 +1,4 @@
-include chromium.inc
+require chromium.inc
 
 inherit distro_features_check gtk-icon-cache
 
