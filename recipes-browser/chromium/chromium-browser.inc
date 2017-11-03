@@ -9,7 +9,7 @@
 include chromium.inc
 
 DESCRIPTION = "Chromium browser"
-DEPENDS += "libgnome-keyring gperf-native"
+DEPENDS += "gperf-native"
 DEPENDS_append_libc-musl = " libexecinfo"
 
 SRC_URI = "\
