@@ -10,8 +10,6 @@ DEPENDS = " \
     pango \
     pciutils \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio', '', d)} \
-    xz-native \
-    zlib-native \
 "
 
 COMPATIBLE_MACHINE = "(-)"
