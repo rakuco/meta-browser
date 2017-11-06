@@ -1,7 +1,6 @@
 LICENSE = "BSD"
 DEPENDS = " \
     cairo \
-    gconf \
     libdrm \
     libexif \
     ninja-native \
