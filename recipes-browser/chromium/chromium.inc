@@ -2,7 +2,6 @@ LICENSE = "BSD"
 DEPENDS = " \
     cairo \
     libdrm \
-    libexif \
     ninja-native \
     nss \
     pango \
