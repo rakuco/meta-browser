@@ -9,8 +9,6 @@
 include chromium.inc
 
 DESCRIPTION = "Chromium browser"
-DEPENDS += "gperf-native"
-DEPENDS_append_libc-musl = " libexecinfo"
 
 SRC_URI = "\
         https://commondatastorage.googleapis.com/chromium-browser-official/chromium-${PV}.tar.xz \
