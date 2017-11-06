@@ -92,8 +92,14 @@ do_install() {
 	install -m 0755 ${B}/out/${CHROMIUM_BUILD_TYPE}/chrome ${D}${bindir}/${BPN}/chrome
 	install -m 0755 ${B}/out/${CHROMIUM_BUILD_TYPE}/chromedriver ${D}${bindir}/chromedriver
 	install -m 0644 ${B}/out/${CHROMIUM_BUILD_TYPE}/icudtl.dat ${D}${bindir}/${BPN}/icudtl.dat
-	install -m 0644 ${WORKDIR}/google-chrome.desktop ${D}${datadir}/applications/google-chrome.desktop
 	install -m 0644 ${B}/out/${CHROMIUM_BUILD_TYPE}/product_logo_48.png ${D}${bindir}/${BPN}/product_logo_48.png
+
+	# Process and install Chromium's template .desktop file.
+	sed -e "s,@@MENUNAME@@,Chromium Browser,g" \
+	    -e "s,@@PACKAGE@@,${bindir}/${BPN}/product_logo_48.png,g" \
+	    -e "s,@@USR_BIN_SYMLINK_NAME@@,google-chrome,g" \
+	    ${S}/chrome/installer/linux/common/desktop.template > ${B}/out/${CHROMIUM_BUILD_TYPE}/google-chrome.desktop
+	install -m 0644 ${B}/out/${CHROMIUM_BUILD_TYPE}/google-chrome.desktop ${D}${datadir}/applications/google-chrome.desktop
 
 	# Chromium *.pak files
 	install -m 0644 ${B}/out/${CHROMIUM_BUILD_TYPE}/chrome_*.pak ${D}${bindir}/${BPN}/
