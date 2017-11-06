@@ -1,10 +1,12 @@
-include chromium-browser.inc
+include chromium.inc
 
-inherit distro_features_check
+inherit distro_features_check gtk-icon-cache
 
 OUTPUT_DIR = "out/${CHROMIUM_BUILD_TYPE}"
 B = "${S}/${OUTPUT_DIR}"
 
+# Append instead of assigning; the gtk-icon-cache class inherited above also
+# adds packages to DEPENDS.
 DEPENDS += " \
     alsa-lib \
     cairo \
@@ -38,6 +40,64 @@ SRC_URI[sha256sum] = "f038e72cbd8b7383d13c286329623fda8d6d48f45fa2d964e554b55652
 
 # For now, we need X11 for Chromium to build and run.
 REQUIRED_DISTRO_FEATURES = "x11"
+
+# PACKAGECONFIG options
+# ^^^^^^^^^^^^^^^^^^^^^
+# * use-egl: (on by default)
+#       Without this packageconfig, the Chromium build will use GLX for
+#       creating an OpenGL context in X11, and regular OpenGL for painting
+#       operations. Neither are desirable on embedded platforms. With this
+#       packageconfig, EGL and OpenGL ES 2.x are used instead.
+#
+# * component-build: (off by default)
+#       Enables component build mode. By default, all of Chromium (with the
+#       exception of FFmpeg) is linked into one big binary. The linker step
+#       requires at least 8 GB RAM. Component mode was created to facilitate
+#       development and testing, since with it, there is not one big binary;
+#       instead, each component is linked to a separate shared object. Use
+#       component mode for development, testing, and in case the build machine
+#       is not a 64-bit one, or has less than 8 GB RAM.
+#
+# * ignore-lost-context: (off by default)
+#       There is a flaw in the HTML Canvas specification. When the canvas'
+#       backing store is some kind of hardware resource like an OpenGL
+#       texture, this resource might get lost. In case of OpenGL textures,
+#       this happens when the OpenGL context gets lost. The canvas should then
+#       be repainted, but nothing in the Canvas standard reflects that. This
+#       packageconfig is to be used if the underlying OpenGL (ES) drivers do
+#       not lose the context, or if losing the context is considered okay
+#       (note that canvas contents can vanish then).
+#
+# * impl-side-painting: (off by default)
+#       This is a new painting mechanism. Still in
+#       development stages, it can improve performance See
+#       http://www.chromium.org/developers/design-documents/impl-side-painting
+#       for more.
+#
+# * kiosk-mode: (off by default)
+#       Enable this option if you want your browser to start up full-screen,
+#       without any menu bars, without any clutter, and without any initial
+#       start-up indicators.
+#
+# * proprietary-codecs: (off by default)
+#       Enable this option if you want to add support for additional proprietary
+#       codecs, most notably MPEG standards (h.264, h.265, MP4, MP3, AAC, MPEG-2 ..)
+
+PACKAGECONFIG ??= "use-egl"
+
+# this makes sure the dependencies for the EGL mode are present; otherwise, the configure scripts
+# automatically and silently fall back to GLX
+PACKAGECONFIG[use-egl] = ",,virtual/egl virtual/libgles2"
+
+# Empty PACKAGECONFIG options listed here to avoid warnings.
+# The .bb file should use these to conditionally add patches
+# and command-line switches (extra dependencies should not
+# be necessary but are OK to add).
+PACKAGECONFIG[component-build] = ""
+PACKAGECONFIG[ignore-lost-context] = ""
+PACKAGECONFIG[impl-side-painting] = ""
+PACKAGECONFIG[kiosk-mode] = ""
+PACKAGECONFIG[proprietary-codecs] = ""
 
 # These are present as their own variables, since they have changed between versions
 # a few times in the past already; making them variables makes it easier to handle that
@@ -114,6 +174,13 @@ GYP_DEFINES_append_arm = " \
         -Darm_fpu=${ARM_FPU} \
         -Darm_tune=${ARM_TUNE} \
         -Darm_version=${ARM_VERSION} \
+"
+
+CHROMIUM_EXTRA_ARGS ?= " \
+        ${@bb.utils.contains('PACKAGECONFIG', 'use-egl', '--use-gl=egl', '', d)} \
+        ${@bb.utils.contains('PACKAGECONFIG', 'ignore-lost-context', '--gpu-no-context-lost', '', d)} \
+        ${@bb.utils.contains('PACKAGECONFIG', 'impl-side-painting', '--enable-gpu-rasterization --enable-impl-side-painting', '', d)} \
+        ${@bb.utils.contains('PACKAGECONFIG', 'kiosk-mode', '--start-fullscreen --kiosk --no-first-run --incognito', '', d)} \
 "
 
 python() {

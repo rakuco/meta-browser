@@ -1,6 +1,6 @@
-LICENSE = "BSD"
+DESCRIPTION = "Chromium browser"
 
-inherit gtk-icon-cache
+LICENSE = "BSD"
 
 COMPATIBLE_MACHINE = "(-)"
 COMPATIBLE_MACHINE_x86 = "(.*)"
