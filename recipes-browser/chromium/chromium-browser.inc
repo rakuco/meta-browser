@@ -165,7 +165,7 @@ do_configure_append() {
 do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
 
 do_compile() {
-        ninja -C ${S}/out/${CHROMIUM_BUILD_TYPE} ${PARALLEL_MAKE} chrome chrome_sandbox chromedriver
+        ninja -C ${S}/out/${CHROMIUM_BUILD_TYPE} -v ${PARALLEL_MAKE} chrome chrome_sandbox chromedriver
 }
 
 do_install_append() {
