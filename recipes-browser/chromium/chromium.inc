@@ -1,9 +1,13 @@
 LICENSE = "BSD"
 
+inherit gtk-icon-cache
+
 OUTPUT_DIR = "out/${CHROMIUM_BUILD_TYPE}"
 B = "${S}/${OUTPUT_DIR}"
 
-DEPENDS = " \
+# Append instead of assigning; the gtk-icon-cache class inherited above also
+# adds packages to DEPENDS.
+DEPENDS += " \
     cairo \
     libdrm \
     ninja-native \
@@ -89,6 +93,8 @@ do_install() {
 	install -d ${D}${bindir}/${BPN}/locales
 	install -d ${D}${datadir}
 	install -d ${D}${datadir}/applications
+	install -d ${D}${datadir}/icons
+	install -d ${D}${datadir}/icons/hicolor
 	install -d ${D}${sbindir}
 
 	install -m 0755 ${WORKDIR}/google-chrome ${D}${bindir}/google-chrome
@@ -96,14 +102,26 @@ do_install() {
 	install -m 0755 chrome ${D}${bindir}/${BPN}/chrome
 	install -m 0755 chromedriver ${D}${bindir}/chromedriver
 	install -m 0644 icudtl.dat ${D}${bindir}/${BPN}/icudtl.dat
-	install -m 0644 product_logo_48.png ${D}${bindir}/${BPN}/product_logo_48.png
 
 	# Process and install Chromium's template .desktop file.
 	sed -e "s,@@MENUNAME@@,Chromium Browser,g" \
-	    -e "s,@@PACKAGE@@,${bindir}/${BPN}/product_logo_48.png,g" \
+	    -e "s,@@PACKAGE@@,chromium,g" \
 	    -e "s,@@USR_BIN_SYMLINK_NAME@@,google-chrome,g" \
 	    ${S}/chrome/installer/linux/common/desktop.template > google-chrome.desktop
 	install -m 0644 google-chrome.desktop ${D}${datadir}/applications/google-chrome.desktop
+
+	# Install icons.
+	for size in 16 22 24 32 48 64 128 256; do
+		install -d ${D}${datadir}/icons/hicolor/${size}x${size}
+		install -d ${D}${datadir}/icons/hicolor/${size}x${size}/apps
+		for dirname in "chromium" "default_100_percent/chromium"; do
+			icon="${S}/chrome/app/theme/${dirname}/product_logo_${size}.png"
+			if [ -f "${icon}" ]; then
+				install -m 0644 "${icon}" \
+					${D}${datadir}/icons/hicolor/${size}x${size}/apps/chromium.png
+			fi
+		done
+	done
 
 	# Chromium *.pak files
 	install -m 0644 chrome_*.pak ${D}${bindir}/${BPN}/
@@ -123,6 +141,7 @@ FILES_${PN} = " \
         ${bindir}/${BPN}/*.pak \
         ${bindir}/${BPN}/locales/*.pak \
         ${datadir}/applications \
+        ${datadir}/icons/hicolor/*x*/apps/chromium.png \
         ${libdir} \
         ${libdir}/${BPN}/ \
         ${sbindir}/ \
