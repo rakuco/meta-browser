@@ -1,7 +1,6 @@
 LICENSE = "BSD"
 DEPENDS = " \
     cairo \
-    cups \
     gconf \
     libdrm \
     libexif \
