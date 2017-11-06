@@ -9,7 +9,6 @@ DEPENDS += " \
     libxss \
     libxtst \
     virtual/libgl \
-    xextproto \
 "
 
 SRC_URI += "\
