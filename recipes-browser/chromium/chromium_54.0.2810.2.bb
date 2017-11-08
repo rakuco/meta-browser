@@ -332,25 +332,24 @@ do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
 
 do_install() {
 	install -d ${D}${bindir}
-	install -d ${D}${bindir}/${BPN}
-	install -d ${D}${bindir}/${BPN}/locales
 	install -d ${D}${datadir}
 	install -d ${D}${datadir}/applications
 	install -d ${D}${datadir}/icons
 	install -d ${D}${datadir}/icons/hicolor
-	install -d ${D}${sbindir}
+	install -d ${D}${libdir}/chromium
+	install -d ${D}${libdir}/chromium/locales
 
-	install -m 0755 ${WORKDIR}/google-chrome ${D}${bindir}/google-chrome
-	install -m 4755 chrome_sandbox ${D}${sbindir}/chrome-devel-sandbox
-	install -m 0755 chrome ${D}${bindir}/${BPN}/chrome
-	install -m 0644 icudtl.dat ${D}${bindir}/${BPN}/icudtl.dat
+	install -m 0755 ${WORKDIR}/google-chrome ${D}${bindir}/chromium
+	install -m 4755 chrome_sandbox ${D}${libdir}/chromium/chrome-sandbox
+	install -m 0755 chrome ${D}${libdir}/chromium/chromium
+	install -m 0644 icudtl.dat ${D}${libdir}/chromium/icudtl.dat
 
 	# Process and install Chromium's template .desktop file.
 	sed -e "s,@@MENUNAME@@,Chromium Browser,g" \
 	    -e "s,@@PACKAGE@@,chromium,g" \
-	    -e "s,@@USR_BIN_SYMLINK_NAME@@,google-chrome,g" \
-	    ${S}/chrome/installer/linux/common/desktop.template > google-chrome.desktop
-	install -m 0644 google-chrome.desktop ${D}${datadir}/applications/google-chrome.desktop
+	    -e "s,@@USR_BIN_SYMLINK_NAME@@,chromium,g" \
+	    ${S}/chrome/installer/linux/common/desktop.template > chromium.desktop
+	install -m 0644 chromium.desktop ${D}${datadir}/applications/chromium.desktop
 
 	# Install icons.
 	for size in 16 22 24 32 48 64 128 256; do
@@ -366,24 +365,21 @@ do_install() {
 	done
 
 	# Chromium *.pak files
-	install -m 0644 chrome_*.pak ${D}${bindir}/${BPN}/
-	install -m 0644 resources.pak ${D}${bindir}/${BPN}/resources.pak
+	install -m 0644 chrome_*.pak ${D}${libdir}/chromium/
+	install -m 0644 resources.pak ${D}${libdir}/chromium/resources.pak
 
 	# Locales.
-	install -m 0644 locales/*.pak ${D}${bindir}/${BPN}/locales/
+	install -m 0644 locales/*.pak ${D}${libdir}/chromium/locales/
 
-	# Add extra command line arguments to google-chrome script by modifying
+	# Add extra command line arguments to the chromium script by modifying
 	# the dummy "CHROME_EXTRA_ARGS" line
-	sed -i "s/^CHROME_EXTRA_ARGS=\"\"/CHROME_EXTRA_ARGS=\"${CHROMIUM_EXTRA_ARGS}\"/" ${D}${bindir}/google-chrome
+	sed -i "s/^CHROME_EXTRA_ARGS=\"\"/CHROME_EXTRA_ARGS=\"${CHROMIUM_EXTRA_ARGS}\"/" ${D}${bindir}/chromium
 
 	# update ROOT_HOME with the root user's $HOME
-	sed -i "s#ROOT_HOME#${ROOT_HOME}#" ${D}${bindir}/google-chrome
+	sed -i "s#ROOT_HOME#${ROOT_HOME}#" ${D}${bindir}/chromium
 
-	# Always adding this libdir (not just with component builds), because the
-	# LD_LIBRARY_PATH line in the google-chromium script refers to it
-	install -d ${D}${libdir}/${BPN}/
 	if [ -n "${@bb.utils.contains('PACKAGECONFIG', 'component-build', 'component-build', '', d)}" ]; then
-		install -m 0755 *.so ${D}${libdir}/${BPN}/
+		install -m 0755 *.so ${D}${libdir}/chromium/
 	fi
 
 	# ChromeDriver.
@@ -395,15 +391,10 @@ PACKAGES =+ "${PN}-chromedriver"
 FILES_${PN}-chromedriver = "${bindir}/chromedriver"
 
 FILES_${PN} = " \
-        ${bindir} \
-        ${bindir}/${BPN} \
-        ${bindir}/${BPN}/*.pak \
-        ${bindir}/${BPN}/locales/*.pak \
-        ${datadir}/applications \
+        ${bindir}/${PN} \
+        ${datadir}/applications/${PN}.desktop \
         ${datadir}/icons/hicolor/*x*/apps/chromium.png \
-        ${libdir} \
-        ${libdir}/${BPN}/ \
-        ${sbindir}/ \
+        ${libdir}/${PN}/* \
 "
 
 PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
