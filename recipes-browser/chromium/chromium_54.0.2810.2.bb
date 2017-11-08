@@ -43,12 +43,14 @@ DEPENDS += " \
 "
 DEPENDS_append_libc-musl = " libexecinfo"
 
+# The wrapper script we use from upstream requires bash.
+RDEPENDS_${PN} = "bash"
+
 SRC_URI += "\
         file://add_missing_stat_h_include.patch \
         file://0005-Override-root-filesystem-access-restriction.patch \
         file://0011-Replace-readdir_r-with-readdir.patch \
         ${@bb.utils.contains('PACKAGECONFIG', 'ignore-lost-context', 'file://0001-Remove-accelerated-Canvas-support-from-blacklist.patch', '', d)} \
-        file://google-chrome \
         file://unset-madv-free.patch \
         file://0001-v8-fix-build-with-gcc7.patch \
         file://0002-WebKit-fix-build-with-gcc7.patch \
@@ -62,6 +64,7 @@ SRC_URI += "\
         file://0001-gn-Make-arm_arch-configurable.patch \
         file://0002-gn-Make-arm_fpu-configurable.patch \
         file://v8-qemu-wrapper.patch \
+        file://wrapper-extra-flags.patch \
 "
 SRC_URI_append_libc-musl = "\
         file://musl-support/0001-sandbox-Define-TEMP_FAILURE_RETRY-if-not-defined.patch \
@@ -339,9 +342,8 @@ do_install() {
 	install -d ${D}${libdir}/chromium
 	install -d ${D}${libdir}/chromium/locales
 
-	install -m 0755 ${WORKDIR}/google-chrome ${D}${bindir}/chromium
 	install -m 4755 chrome_sandbox ${D}${libdir}/chromium/chrome-sandbox
-	install -m 0755 chrome ${D}${libdir}/chromium/chromium
+	install -m 0755 chrome ${D}${libdir}/chromium/chromium-bin
 	install -m 0644 icudtl.dat ${D}${libdir}/chromium/icudtl.dat
 
 	# Process and install Chromium's template .desktop file.
@@ -364,6 +366,16 @@ do_install() {
 		done
 	done
 
+	# A wrapper for the proprietary Google Chrome version already exists.
+	# We can just use that one instead of reinventing the wheel.
+	WRAPPER_FILE=${S}/chrome/installer/linux/common/wrapper
+	sed -e "s,@@CHANNEL@@,stable,g" \
+		-e "s,@@DEFAULT_FLAGS@@ ,,g" \
+		-e "s,@@PROGNAME@@,chromium-bin,g" \
+		${WRAPPER_FILE} > chromium-wrapper
+	install -m 0755 chromium-wrapper ${D}${libdir}/chromium/chromium-wrapper
+	ln -s ${libdir}/chromium/chromium-wrapper ${D}${bindir}/chromium
+
 	# Chromium *.pak files
 	install -m 0644 chrome_*.pak ${D}${libdir}/chromium/
 	install -m 0644 resources.pak ${D}${libdir}/chromium/resources.pak
@@ -373,10 +385,10 @@ do_install() {
 
 	# Add extra command line arguments to the chromium script by modifying
 	# the dummy "CHROME_EXTRA_ARGS" line
-	sed -i "s/^CHROME_EXTRA_ARGS=\"\"/CHROME_EXTRA_ARGS=\"${CHROMIUM_EXTRA_ARGS}\"/" ${D}${bindir}/chromium
+	sed -i "s/^CHROME_EXTRA_ARGS=\"\"/CHROME_EXTRA_ARGS=\"${CHROMIUM_EXTRA_ARGS}\"/" ${D}${libdir}/chromium/chromium-wrapper
 
 	# update ROOT_HOME with the root user's $HOME
-	sed -i "s#ROOT_HOME#${ROOT_HOME}#" ${D}${bindir}/chromium
+	sed -i "s#ROOT_HOME#${ROOT_HOME}#" ${D}${libdir}/chromium/chromium-wrapper
 
 	if [ -n "${@bb.utils.contains('PACKAGECONFIG', 'component-build', 'component-build', '', d)}" ]; then
 		install -m 0755 *.so ${D}${libdir}/chromium/
