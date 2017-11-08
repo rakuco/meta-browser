@@ -2,9 +2,6 @@ LICENSE = "BSD"
 
 inherit gtk-icon-cache
 
-OUTPUT_DIR = "out/${CHROMIUM_BUILD_TYPE}"
-B = "${S}/${OUTPUT_DIR}"
-
 COMPATIBLE_MACHINE = "(-)"
 COMPATIBLE_MACHINE_x86 = "(.*)"
 COMPATIBLE_MACHINE_x86-64 = "(.*)"
@@ -57,67 +54,10 @@ GYP_DEFINES_append_arm = " \
         -Darm_version=${ARM_VERSION} \
 "
 
-do_configure_prepend_libc-musl() {
-	for f in `find ${S}/third_party/ffmpeg/chromium/config/{Chrome,Chromium}/linux/ -name config.h -o -name config.asm`; do
-		sed -i -e "s:define HAVE_SYSCTL 1:define HAVE_SYSCTL 0:g" $f
-	done
-	sed -i -e "s:define HAVE_STRUCT_MALLINFO 1:/*undef HAVE_STRUCT_MALLINFO */:g" ${S}/third_party/tcmalloc/chromium/src/config_linux.h
-}
-
-do_configure() {
-	cd ${S}
-	GYP_DEFINES="${GYP_DEFINES}" export GYP_DEFINES
-	# replace LD with CXX, to workaround a possible gyp issue?
-	LD="${CXX}" export LD
-	CC="${CC}" export CC
-	CXX="${CXX}" export CXX
-	CC_host="${BUILD_CC}" export CC_host
-	CXX_host="${BUILD_CXX}" export CXX_host
-}
-
-do_install() {
-	install -d ${D}${bindir}
-	install -d ${D}${bindir}/${BPN}
-	install -d ${D}${bindir}/${BPN}/locales
-	install -d ${D}${datadir}
-	install -d ${D}${datadir}/applications
-	install -d ${D}${datadir}/icons
-	install -d ${D}${datadir}/icons/hicolor
-	install -d ${D}${sbindir}
-
-	install -m 0755 ${WORKDIR}/google-chrome ${D}${bindir}/google-chrome
-	install -m 4755 chrome_sandbox ${D}${sbindir}/chrome-devel-sandbox
-	install -m 0755 chrome ${D}${bindir}/${BPN}/chrome
-	install -m 0755 chromedriver ${D}${bindir}/chromedriver
-	install -m 0644 icudtl.dat ${D}${bindir}/${BPN}/icudtl.dat
-
-	# Process and install Chromium's template .desktop file.
-	sed -e "s,@@MENUNAME@@,Chromium Browser,g" \
-	    -e "s,@@PACKAGE@@,chromium,g" \
-	    -e "s,@@USR_BIN_SYMLINK_NAME@@,google-chrome,g" \
-	    ${S}/chrome/installer/linux/common/desktop.template > google-chrome.desktop
-	install -m 0644 google-chrome.desktop ${D}${datadir}/applications/google-chrome.desktop
-
-	# Install icons.
-	for size in 16 22 24 32 48 64 128 256; do
-		install -d ${D}${datadir}/icons/hicolor/${size}x${size}
-		install -d ${D}${datadir}/icons/hicolor/${size}x${size}/apps
-		for dirname in "chromium" "default_100_percent/chromium"; do
-			icon="${S}/chrome/app/theme/${dirname}/product_logo_${size}.png"
-			if [ -f "${icon}" ]; then
-				install -m 0644 "${icon}" \
-					${D}${datadir}/icons/hicolor/${size}x${size}/apps/chromium.png
-			fi
-		done
-	done
-
-	# Chromium *.pak files
-	install -m 0644 chrome_*.pak ${D}${bindir}/${BPN}/
-	install -m 0644 resources.pak ${D}${bindir}/${BPN}/resources.pak
-
-	# Locales.
-	install -m 0644 locales/*.pak ${D}${bindir}/${BPN}/locales/
-}
+# Disable activation of field trial tests that can cause problems in
+# production.
+# See https://groups.google.com/a/chromium.org/d/msg/chromium-packagers/ECWC57W7E0k/9Kc5UAmyDAAJ
+GYP_DEFINES += "-Dfieldtrial_testing_like_official_build=1"
 
 PACKAGES =+ "${PN}-chromedriver"
 
