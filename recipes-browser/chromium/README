@@ -27,15 +27,6 @@ PACKAGECONFIG knobs
   to a separate shared object. Use component mode for development, testing, and
   in case the build machine is not a 64-bit one, or has less than 8 GB RAM.
 
-* ignore-lost-context: (off by default)
-  There is a flaw in the HTML Canvas specification. When the canvas' backing
-  store is some kind of hardware resource like an OpenGL texture, this resource
-  might get lost. In case of OpenGL textures, this happens when the OpenGL
-  context gets lost. The canvas should then be repainted, but nothing in the
-  Canvas standard reflects that. This packageconfig is to be used if the
-  underlying OpenGL (ES) drivers do not lose the context, or if losing the
-  context is considered okay (note that canvas contents can vanish then).
-
 * impl-side-painting: (off by default)
   This is a new painting mechanism. Still in development stages, it can improve
   performance See
