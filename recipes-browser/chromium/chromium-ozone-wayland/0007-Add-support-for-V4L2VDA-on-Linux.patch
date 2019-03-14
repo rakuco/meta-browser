@@ -10,7 +10,7 @@ try to upstream it.
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From 9849160a170a4ee009f4cede42fdb3a9e4a6d033 Mon Sep 17 00:00:00 2001
+From f1c8575974ab88e7899c484fb66aae540f1ccb82 Mon Sep 17 00:00:00 2001
 From: Damian Hobson-Garcia <dhobsong@igel.co.jp>
 Date: Tue, 10 Oct 2017 11:34:22 +0900
 Subject: [PATCH 07/42] Add support for V4L2VDA on Linux
@@ -30,21 +30,19 @@ fixup! avoid building not declared formats
 Signed-off-by: Ryo Kodama <ryo.kodama.vz@renesas.com>
 
 Issue #437
-
-Change-Id: If29dd65ef783037dea0d021ac7a1c8c331c9fbdf
 ---
- media/gpu/BUILD.gn                            | 16 ++++++++-----
- media/gpu/args.gni                            |  4 ++++
+ media/gpu/BUILD.gn                            | 16 ++++++++----
+ media/gpu/args.gni                            |  4 +++
  .../gpu_jpeg_decode_accelerator_factory.cc    |  3 ++-
- .../gpu_video_decode_accelerator_factory.cc   |  8 +++++++
+ .../gpu_video_decode_accelerator_factory.cc   |  8 ++++++
  .../gpu_video_decode_accelerator_factory.h    |  2 ++
  media/gpu/v4l2/generic_v4l2_device.cc         |  6 ++++-
- media/gpu/v4l2/v4l2_device.cc                 | 23 +++++++++++++++++++
+ media/gpu/v4l2/v4l2_device.cc                 | 25 +++++++++++++++++++
  .../gpu/v4l2/v4l2_video_decode_accelerator.cc |  6 ++++-
- 8 files changed, 59 insertions(+), 9 deletions(-)
+ 8 files changed, 62 insertions(+), 8 deletions(-)
 
 diff --git a/media/gpu/BUILD.gn b/media/gpu/BUILD.gn
-index 8cde0b7c5f18..d1f658098ccd 100644
+index 8cde0b7c5f18..5ea2efd05d14 100644
 --- a/media/gpu/BUILD.gn
 +++ b/media/gpu/BUILD.gn
 @@ -17,6 +17,7 @@ buildflag_header("buildflags") {
@@ -77,11 +75,10 @@ index 8cde0b7c5f18..d1f658098ccd 100644
        "v4l2/v4l2_video_decode_accelerator.cc",
        "v4l2/v4l2_video_decode_accelerator.h",
        "v4l2/v4l2_video_encode_accelerator.cc",
-@@ -232,7 +229,14 @@ component("gpu") {
-       "v4l2/v4l2_vp9_accelerator.cc",
+@@ -233,6 +230,15 @@ component("gpu") {
        "v4l2/v4l2_vp9_accelerator.h",
      ]
--
+ 
 +    if (!use_linux_v4l2_only) {
 +      sources += [
 +        "v4l2_jpeg_decode_accelerator.cc",
@@ -90,6 +87,7 @@ index 8cde0b7c5f18..d1f658098ccd 100644
 +        "v4l2_slice_video_decode_accelerator.h",
 +      ]
 +    }
++
      libs = [
        "EGL",
        "GLESv2",
@@ -214,13 +212,15 @@ index d59dc6ced7a3..42d2cb2a6051 100644
      use_libv4l2_ = true;
    }
 diff --git a/media/gpu/v4l2/v4l2_device.cc b/media/gpu/v4l2/v4l2_device.cc
-index faa1af6bd2dd..0ba489fbfc89 100644
+index faa1af6bd2dd..69cf440043f4 100644
 --- a/media/gpu/v4l2/v4l2_device.cc
 +++ b/media/gpu/v4l2/v4l2_device.cc
-@@ -920,6 +920,19 @@ uint32_t V4L2Device::VideoFrameLayoutToV4L2PixFmt(
+@@ -919,6 +919,21 @@ uint32_t V4L2Device::VideoFrameLayoutToV4L2PixFmt(
+                                       layout.num_buffers() == 1);
  }
  
- // static
++
++// static
 +#if BUILDFLAG(USE_LINUX_V4L2)
 +uint32_t V4L2Device::VideoCodecProfileToV4L2PixFmt(VideoCodecProfile profile,
 +                                                   bool slice_based) {
@@ -234,10 +234,10 @@ index faa1af6bd2dd..0ba489fbfc89 100644
 +  }
 +}
 +#else
+ // static
  uint32_t V4L2Device::VideoCodecProfileToV4L2PixFmt(VideoCodecProfile profile,
                                                     bool slice_based) {
-   if (profile >= H264PROFILE_MIN && profile <= H264PROFILE_MAX) {
-@@ -960,6 +973,7 @@ VideoCodecProfile V4L2Device::V4L2VP9ProfileToVideoCodecProfile(
+@@ -960,6 +975,7 @@ VideoCodecProfile V4L2Device::V4L2VP9ProfileToVideoCodecProfile(
        return VIDEO_CODEC_PROFILE_UNKNOWN;
    }
  }
@@ -245,7 +245,7 @@ index faa1af6bd2dd..0ba489fbfc89 100644
  
  // static
  std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
-@@ -970,7 +984,9 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
+@@ -970,7 +986,9 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
  
    switch (pix_fmt) {
      case V4L2_PIX_FMT_H264:
@@ -255,7 +255,7 @@ index faa1af6bd2dd..0ba489fbfc89 100644
        if (is_encoder) {
          // TODO(posciak): need to query the device for supported H.264 profiles,
          // for now choose Main as a sensible default.
-@@ -983,11 +999,14 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
+@@ -983,11 +1001,14 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
        break;
  
      case V4L2_PIX_FMT_VP8:
@@ -270,7 +270,7 @@ index faa1af6bd2dd..0ba489fbfc89 100644
      case V4L2_PIX_FMT_VP9:
      case V4L2_PIX_FMT_VP9_FRAME: {
        v4l2_queryctrl query_ctrl = {};
-@@ -1014,6 +1033,7 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
+@@ -1014,6 +1035,7 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
        }
        break;
      }
@@ -278,16 +278,17 @@ index faa1af6bd2dd..0ba489fbfc89 100644
  
      default:
        VLOGF(1) << "Unhandled pixelformat " << FourccToString(pix_fmt);
-@@ -1044,6 +1064,9 @@ uint32_t V4L2Device::V4L2PixFmtToDrmFormat(uint32_t format) {
+@@ -1044,7 +1066,10 @@ uint32_t V4L2Device::V4L2PixFmtToDrmFormat(uint32_t format) {
        return DRM_FORMAT_ARGB8888;
  
      case V4L2_PIX_FMT_MT21C:
 +#if !BUILDFLAG(USE_LINUX_V4L2)
 +    case V4L2_PIX_FMT_MT21:
-+#endif
        return DRM_FORMAT_MT21;
++#endif
  
      default:
+       DVLOGF(1) << "Unrecognized format " << FourccToString(format);
 diff --git a/media/gpu/v4l2/v4l2_video_decode_accelerator.cc b/media/gpu/v4l2/v4l2_video_decode_accelerator.cc
 index 9561839f7feb..119e070fe3e0 100644
 --- a/media/gpu/v4l2/v4l2_video_decode_accelerator.cc

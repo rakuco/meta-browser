@@ -10,7 +10,7 @@ try to upstream it.
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From efdb76e910f5d26fda38d221bd0921fe9e3842a3 Mon Sep 17 00:00:00 2001
+From b07c0310381dd1f83b7db5d9daf7b768df6f252b Mon Sep 17 00:00:00 2001
 From: Damian Hobson-Garcia <dhobsong@igel.co.jp>
 Date: Wed, 21 Mar 2018 13:18:17 +0200
 Subject: [PATCH 08/42] Add mmap via libv4l to generic_v4l2_device
