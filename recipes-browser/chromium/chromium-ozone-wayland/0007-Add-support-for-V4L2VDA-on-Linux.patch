@@ -10,7 +10,7 @@ try to upstream it.
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From f1c8575974ab88e7899c484fb66aae540f1ccb82 Mon Sep 17 00:00:00 2001
+From 1d612d9d5ad4a1e44ca74549f657eaa3383ae528 Mon Sep 17 00:00:00 2001
 From: Damian Hobson-Garcia <dhobsong@igel.co.jp>
 Date: Tue, 10 Oct 2017 11:34:22 +0900
 Subject: [PATCH 07/42] Add support for V4L2VDA on Linux
@@ -31,18 +31,18 @@ Signed-off-by: Ryo Kodama <ryo.kodama.vz@renesas.com>
 
 Issue #437
 ---
- media/gpu/BUILD.gn                            | 16 ++++++++----
+ media/gpu/BUILD.gn                            | 34 +++++++++++--------
  media/gpu/args.gni                            |  4 +++
- .../gpu_jpeg_decode_accelerator_factory.cc    |  3 ++-
- .../gpu_video_decode_accelerator_factory.cc   |  8 ++++++
+ .../gpu_jpeg_decode_accelerator_factory.cc    |  3 +-
+ .../gpu_video_decode_accelerator_factory.cc   |  8 +++++
  .../gpu_video_decode_accelerator_factory.h    |  2 ++
- media/gpu/v4l2/generic_v4l2_device.cc         |  6 ++++-
- media/gpu/v4l2/v4l2_device.cc                 | 25 +++++++++++++++++++
- .../gpu/v4l2/v4l2_video_decode_accelerator.cc |  6 ++++-
- 8 files changed, 62 insertions(+), 8 deletions(-)
+ media/gpu/v4l2/generic_v4l2_device.cc         |  6 +++-
+ media/gpu/v4l2/v4l2_device.cc                 | 25 ++++++++++++++
+ .../gpu/v4l2/v4l2_video_decode_accelerator.cc |  6 +++-
+ 8 files changed, 71 insertions(+), 17 deletions(-)
 
 diff --git a/media/gpu/BUILD.gn b/media/gpu/BUILD.gn
-index 8cde0b7c5f18..5ea2efd05d14 100644
+index 8cde0b7c5f18..e79e9f116986 100644
 --- a/media/gpu/BUILD.gn
 +++ b/media/gpu/BUILD.gn
 @@ -17,6 +17,7 @@ buildflag_header("buildflags") {
@@ -62,8 +62,17 @@ index 8cde0b7c5f18..5ea2efd05d14 100644
    generate_stubs("libv4l2_stubs") {
      extra_header = "v4l2/v4l2_stub_header.fragment"
      sigs = [ "v4l2/v4l2.sig" ]
-@@ -217,12 +218,8 @@ component("gpu") {
-       "v4l2/v4l2_h264_accelerator.h",
+@@ -208,31 +209,36 @@ component("gpu") {
+     sources += [
+       "v4l2/generic_v4l2_device.cc",
+       "v4l2/generic_v4l2_device.h",
+-      "v4l2/v4l2_decode_surface.cc",
+-      "v4l2/v4l2_decode_surface.h",
+-      "v4l2/v4l2_decode_surface_handler.h",
+       "v4l2/v4l2_device.cc",
+       "v4l2/v4l2_device.h",
+-      "v4l2/v4l2_h264_accelerator.cc",
+-      "v4l2/v4l2_h264_accelerator.h",
        "v4l2/v4l2_image_processor.cc",
        "v4l2/v4l2_image_processor.h",
 -      "v4l2/v4l2_jpeg_decode_accelerator.cc",
@@ -75,12 +84,24 @@ index 8cde0b7c5f18..5ea2efd05d14 100644
        "v4l2/v4l2_video_decode_accelerator.cc",
        "v4l2/v4l2_video_decode_accelerator.h",
        "v4l2/v4l2_video_encode_accelerator.cc",
-@@ -233,6 +230,15 @@ component("gpu") {
-       "v4l2/v4l2_vp9_accelerator.h",
+       "v4l2/v4l2_video_encode_accelerator.h",
+-      "v4l2/v4l2_vp8_accelerator.cc",
+-      "v4l2/v4l2_vp8_accelerator.h",
+-      "v4l2/v4l2_vp9_accelerator.cc",
+-      "v4l2/v4l2_vp9_accelerator.h",
      ]
  
 +    if (!use_linux_v4l2_only) {
 +      sources += [
++        "v4l2/v4l2_decode_surface.cc",
++        "v4l2/v4l2_decode_surface.h",
++        "v4l2/v4l2_decode_surface_handler.h",
++        "v4l2/v4l2_h264_accelerator.cc",
++        "v4l2/v4l2_h264_accelerator.h",
++        "v4l2/v4l2_vp8_accelerator.cc",
++        "v4l2/v4l2_vp8_accelerator.h",
++        "v4l2/v4l2_vp9_accelerator.cc",
++        "v4l2/v4l2_vp9_accelerator.h",
 +        "v4l2_jpeg_decode_accelerator.cc",
 +        "v4l2_jpeg_decode_accelerator.h",
 +        "v4l2_slice_video_decode_accelerator.cc",
