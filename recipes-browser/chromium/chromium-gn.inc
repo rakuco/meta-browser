@@ -11,6 +11,7 @@ B = "${S}/${OUTPUT_DIR}"
 SRC_URI += " \
         file://0001-Add-support-for-GCC-Compilers.patch \
         file://0001-Revert-Use-noexcept-consistently-on-the-move-ctor-of.patch \
+        file://0001-TrackEventJSONExporter-HandleLegacyEvent-Use-std-mov.patch \
         file://0001-webrequest-Fix-GCC-build-after-2d47b917314a.patch \
         file://0001-GCC-7-workaround-remove-constexpr-ctor.patch \
         file://0001-libstdc-do-not-assume-unique_ptr-has-ostream-operato.patch \
