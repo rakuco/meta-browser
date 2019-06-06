@@ -2,10 +2,10 @@ Upstream-Status: Backport
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From d190eb59863386081585b47fd8709c41b4d15a82 Mon Sep 17 00:00:00 2001
+From 083c6bab6d6aae2dc0eb6429a0fdd3e4b4d00c28 Mon Sep 17 00:00:00 2001
 From: Maksim Sisov <msisov@igalia.com>
 Date: Tue, 7 May 2019 08:43:50 +0000
-Subject: [PATCH 25/27] [ozone/wayland] Ease the buffer swap and maintenance
+Subject: [PATCH 04/23] [ozone/wayland] Ease the buffer swap and maintenance
 
 This CL adds a Surface class, which has 1:1 relationship
 with a WaylandWindow (whenever the former is created, the
@@ -40,10 +40,10 @@ Cr-Commit-Position: refs/heads/master@{#657172}
  10 files changed, 532 insertions(+), 441 deletions(-)
 
 diff --git a/ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc b/ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc
-index c9c63c3fed31..e7aeb029dbb6 100644
+index 960afcd41750..ac104754bbf4 100644
 --- a/ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc
 +++ b/ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc
-@@ -180,9 +180,9 @@ void GbmPixmapWayland::CreateZwpLinuxDmabuf() {
+@@ -178,9 +178,9 @@ void GbmPixmapWayland::CreateZwpLinuxDmabuf() {
    base::File file(fd.release());
  
    // Asks Wayland to create a wl_buffer based on the |file| fd.

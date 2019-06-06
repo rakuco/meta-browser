@@ -2,10 +2,10 @@ Upstream-Status: Backport
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From a666b01015595b7ce20812097f3baf0e3cdae61c Mon Sep 17 00:00:00 2001
+From 1d2e6cc13c8a0b37ba8e86200b3ecdcddee796af Mon Sep 17 00:00:00 2001
 From: Alex Ilin <alexilin@chromium.org>
 Date: Tue, 7 May 2019 10:02:57 +0000
-Subject: [PATCH 27/27] wayland: Do not release shared memory fd when passing
+Subject: [PATCH 06/23] wayland: Do not release shared memory fd when passing
  to wl_*
 
 wl_keyboard_send_keymap() and wl_shm_create_pool() do not close a file
@@ -50,10 +50,10 @@ index 64bb682803de..d5b2b4f3c8ba 100644
  
      buffer->buffer.reset(static_cast<wl_buffer*>(
 diff --git a/components/exo/wayland/wayland_keyboard_delegate.cc b/components/exo/wayland/wayland_keyboard_delegate.cc
-index d44d6454e894..5250671626d5 100644
+index 659786ccf350..1023f8086a0f 100644
 --- a/components/exo/wayland/wayland_keyboard_delegate.cc
 +++ b/components/exo/wayland/wayland_keyboard_delegate.cc
-@@ -173,9 +173,9 @@ void WaylandKeyboardDelegate::SendLayout(const xkb_rule_names* names) {
+@@ -187,9 +187,9 @@ void WaylandKeyboardDelegate::SendLayout(const xkb_rule_names* names) {
    DCHECK(shared_keymap.IsValid());
  
    memcpy(shared_keymap.memory(), keymap_string.get(), keymap_size);

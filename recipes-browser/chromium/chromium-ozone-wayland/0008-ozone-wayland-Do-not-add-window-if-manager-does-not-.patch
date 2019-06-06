@@ -2,10 +2,11 @@ Upstream-Status: Backport
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From 5b70aa27f495667f8c436242f4197c1e5645ac68 Mon Sep 17 00:00:00 2001
+From 392a23cbd0f9322fcfb6a296783b9d5b4019b77e Mon Sep 17 00:00:00 2001
 From: Maksim Sisov <msisov@igalia.com>
 Date: Tue, 14 May 2019 06:50:15 +0000
-Subject: [PATCH] [ozone/wayland] Do not add window if manager does not exist
+Subject: [PATCH 08/23] [ozone/wayland] Do not add window if manager does not
+ exist
 
 It may happen that the zwp linux dmabuf protocol is not available.
 In this case, we have already been resetting the gbm device and

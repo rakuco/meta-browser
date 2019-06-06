@@ -2,10 +2,10 @@ Upstream-Status: Backport
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From 8302d5818b32e06b2e8c48921d6528d0a72084db Mon Sep 17 00:00:00 2001
+From ba6da2196cb0a99166afbde04540bb6032702b87 Mon Sep 17 00:00:00 2001
 From: Tanmoy Mollik <triploblastic@google.com>
 Date: Mon, 29 Apr 2019 10:19:00 +0000
-Subject: [PATCH 23/27] Convert wayland buffer to the new shared memory API.
+Subject: [PATCH 02/23] Convert wayland buffer to the new shared memory API.
 
 This CL replaces the deprecated base::SharedMemoryHandle in wayland
 buffer with base::UnsafeSharedMemoryRegion.
@@ -98,10 +98,10 @@ index 0513d4118930..bd469332676a 100644
    };
  
 diff --git a/components/exo/wayland/wayland_keyboard_delegate.cc b/components/exo/wayland/wayland_keyboard_delegate.cc
-index f0a65de972ba..d44d6454e894 100644
+index 3344a33671d2..659786ccf350 100644
 --- a/components/exo/wayland/wayland_keyboard_delegate.cc
 +++ b/components/exo/wayland/wayland_keyboard_delegate.cc
-@@ -163,12 +163,19 @@ void WaylandKeyboardDelegate::SendLayout(const xkb_rule_names* names) {
+@@ -177,12 +177,19 @@ void WaylandKeyboardDelegate::SendLayout(const xkb_rule_names* names) {
        xkb_keymap_get_as_string(xkb_keymap_.get(), XKB_KEYMAP_FORMAT_TEXT_V1));
    DCHECK(keymap_string.get());
    size_t keymap_size = strlen(keymap_string.get()) + 1;

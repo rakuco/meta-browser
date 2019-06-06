@@ -2,10 +2,10 @@ Upstream-Status: Backport
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From 30b6c6545633ab9a2dd4a3361d59828becf2c263 Mon Sep 17 00:00:00 2001
+From 3508c2fe04fba373743c7497ef707e3d36ef6acc Mon Sep 17 00:00:00 2001
 From: Alex Ilin <alexilin@chromium.org>
 Date: Mon, 29 Apr 2019 16:53:06 +0000
-Subject: [PATCH 24/27] Migrate WaylandCanvasSurface to the new shared memory
+Subject: [PATCH 03/23] Migrate WaylandCanvasSurface to the new shared memory
  API
 
 This CL removes the last usage of deprecated base::SharedMemory from

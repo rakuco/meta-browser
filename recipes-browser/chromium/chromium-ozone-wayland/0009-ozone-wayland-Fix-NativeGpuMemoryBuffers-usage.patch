@@ -1,11 +1,11 @@
-Upstream-Status: Submitted [https://crrev.com/c/1609781]
+Upstream-Status: Backport
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From 496c6dee4195bffe2a7ed607782117a60a198813 Mon Sep 17 00:00:00 2001
+From c2f083914a97a815bda12caaa326895328ac774e Mon Sep 17 00:00:00 2001
 From: Maksim Sisov <msisov@igalia.com>
-Date: Mon, 13 May 2019 16:31:06 +0300
-Subject: [PATCH] [ozone/wayland] Fix NativeGpuMemoryBuffers usage.
+Date: Tue, 14 May 2019 18:00:36 +0000
+Subject: [PATCH 09/23] [ozone/wayland] Fix NativeGpuMemoryBuffers usage.
 
 After https://crrev.com/c/1570014, Chromium started to
 crash immediately because of null accelerated widget provided
@@ -32,12 +32,16 @@ and not meant for attaching to Wayland surfaces.
 
 Bug: 962466
 Change-Id: Ied6fd6d3e29fdd21939c8b159682537f9239ab84
+Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/1609781
+Reviewed-by: Robert Kroeger <rjkroege@chromium.org>
+Commit-Queue: Maksim Sisov <msisov@igalia.com>
+Cr-Commit-Position: refs/heads/master@{#659575}
 ---
  ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc | 7 +++++--
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc b/ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc
-index e7aeb029dbb6..5899a352343b 100644
+index ac104754bbf4..89e42ff2531f 100644
 --- a/ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc
 +++ b/ui/ozone/platform/wayland/gpu/gbm_pixmap_wayland.cc
 @@ -35,7 +35,7 @@ GbmPixmapWayland::GbmPixmapWayland(WaylandSurfaceFactory* surface_manager,
@@ -49,7 +53,7 @@ index e7aeb029dbb6..5899a352343b 100644
      connection_->DestroyZwpLinuxDmabuf(widget_, GetUniqueId());
  }
  
-@@ -81,7 +81,10 @@ bool GbmPixmapWayland::InitializeBuffer(gfx::Size size,
+@@ -80,7 +80,10 @@ bool GbmPixmapWayland::InitializeBuffer(gfx::Size size,
      return false;
    }
  

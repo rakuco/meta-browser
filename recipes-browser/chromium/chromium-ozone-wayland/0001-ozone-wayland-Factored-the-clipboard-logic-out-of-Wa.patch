@@ -2,10 +2,10 @@ Upstream-Status: Backport
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From 445eb64203f3ad4d083acc77b05b8df1f0b9e175 Mon Sep 17 00:00:00 2001
+From fc0a7d834a2811c616c0cd78b893b64ac0fecbed Mon Sep 17 00:00:00 2001
 From: Alexander Dunaev <adunaev@igalia.com>
 Date: Mon, 29 Apr 2019 07:59:33 +0000
-Subject: [PATCH 22/27] [ozone/wayland] Factored the clipboard logic out of
+Subject: [PATCH 01/23] [ozone/wayland] Factored the clipboard logic out of
  WaylandConnection.
 
 The ui::WaylandConnection class is somewhat overloaded with various logic,
@@ -23,7 +23,7 @@ Reviewed-by: Maksim Sisov <msisov@igalia.com>
 Reviewed-by: Robert Kroeger <rjkroege@chromium.org>
 Cr-Commit-Position: refs/heads/master@{#654807}
 ---
- ui/ozone/platform/wayland/BUILD.gn            |  2 +
+ ui/ozone/platform/wayland/BUILD.gn            |  4 +-
  .../wayland/host/wayland_clipboard.cc         | 87 +++++++++++++++++++
  .../platform/wayland/host/wayland_clipboard.h | 68 +++++++++++++++
  .../wayland/host/wayland_connection.cc        | 72 +--------------
@@ -32,12 +32,12 @@ Cr-Commit-Position: refs/heads/master@{#654807}
  .../host/wayland_data_device_unittest.cc      |  2 +-
  .../wayland/host/wayland_data_source.cc       |  2 +-
  .../wayland/ozone_platform_wayland.cc         |  2 +-
- 9 files changed, 169 insertions(+), 112 deletions(-)
+ 9 files changed, 170 insertions(+), 113 deletions(-)
  create mode 100644 ui/ozone/platform/wayland/host/wayland_clipboard.cc
  create mode 100644 ui/ozone/platform/wayland/host/wayland_clipboard.h
 
 diff --git a/ui/ozone/platform/wayland/BUILD.gn b/ui/ozone/platform/wayland/BUILD.gn
-index 3d71dc1b3124..270e15f6c7e2 100644
+index bc651e1c3bcd..1e5aa6f1dc55 100644
 --- a/ui/ozone/platform/wayland/BUILD.gn
 +++ b/ui/ozone/platform/wayland/BUILD.gn
 @@ -32,6 +32,8 @@ source_set("wayland") {
@@ -49,6 +49,15 @@ index 3d71dc1b3124..270e15f6c7e2 100644
      "host/wayland_connection.cc",
      "host/wayland_connection.h",
      "host/wayland_connection_connector.cc",
+@@ -127,7 +129,7 @@ source_set("wayland") {
+   ]
+ 
+   if (is_linux && !is_chromeos) {
+-    deps += ["//ui/base/ime/linux"]
++    deps += [ "//ui/base/ime/linux" ]
+   }
+ 
+   defines = [ "OZONE_IMPLEMENTATION" ]
 diff --git a/ui/ozone/platform/wayland/host/wayland_clipboard.cc b/ui/ozone/platform/wayland/host/wayland_clipboard.cc
 new file mode 100644
 index 000000000000..ae4fb0617906

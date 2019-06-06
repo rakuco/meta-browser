@@ -2,10 +2,10 @@ Upstream-Status: Backport
 
 Signed-off-by: Maksim Sisov <msisov@igalia.com>
 ---
-From 2b9ecfcd047732ca452e5446d887186e62ce5c21 Mon Sep 17 00:00:00 2001
+From 2f6ba5adea52982b52ec6ade87e90640099bf469 Mon Sep 17 00:00:00 2001
 From: Maksim Sisov <msisov@igalia.com>
 Date: Tue, 7 May 2019 09:15:47 +0000
-Subject: [PATCH 26/27] [ozone/wayland] Fix presentation feedback flags.
+Subject: [PATCH 05/23] [ozone/wayland] Fix presentation feedback flags.
 
 Wayland VSync is different from what Chromium expects.
 
