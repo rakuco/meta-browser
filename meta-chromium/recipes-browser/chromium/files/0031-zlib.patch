@@ -1,0 +1,17 @@
+Upstream-status: Inappropriate
+
+Attempt to fix the issue reported in https://github.com/OSSystems/meta-browser/pull/729
+
+Signed-off-by: Raphael Kubo da Costa <raphael.kubo.da.costa@intel.com>
+diff --git a/third_party/zlib/gzguts.h b/third_party/zlib/gzguts.h
+index e23f831f531bb..5b85ef7f95cb8 100644
+--- a/third_party/zlib/gzguts.h
++++ b/third_party/zlib/gzguts.h
+@@ -9,6 +9,7 @@
+ #  endif
+ #  ifdef _FILE_OFFSET_BITS
+ #    undef _FILE_OFFSET_BITS
++#    undef _TIME_BITS
+ #  endif
+ #endif
+ 
